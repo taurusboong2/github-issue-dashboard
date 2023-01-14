@@ -8,9 +8,7 @@ import { getItem, setItem } from '@/commons/localStorage';
 import { RepositoryItem } from '@/types/repository';
 import { Box, InputSearch, SimpleUser } from '@/components/common';
 import { IconRepository } from '@/components/icons';
-
-const MAX_FAVORITE_ITEM_COUNT = 4;
-const KEY = 'boong_favorite_items';
+import { MAX_FAVORITE_ITEM_COUNT, FAVORITE_ITEM_LOCALSTORAGE_KEY } from '@/constants';
 
 const Home = () => {
   const [currentParams, setParams] = useSearchParams();
@@ -33,7 +31,7 @@ const Home = () => {
   } = useFetchRepositories({ q, page, per_page });
 
   useEffect(() => {
-    const favoriteRepositoriesString = getItem(KEY);
+    const favoriteRepositoriesString = getItem(FAVORITE_ITEM_LOCALSTORAGE_KEY);
 
     const saved = favoriteRepositoriesString ? (JSON.parse(favoriteRepositoriesString) as number[]) : [];
 
@@ -59,14 +57,14 @@ const Home = () => {
     }
     const newFavoriteRepositoriesIds = [...favoriteRepositoriesIds, id];
 
-    setItem(KEY, JSON.stringify(newFavoriteRepositoriesIds));
+    setItem(FAVORITE_ITEM_LOCALSTORAGE_KEY, JSON.stringify(newFavoriteRepositoriesIds));
     setFavoriteRepositoriesIds(newFavoriteRepositoriesIds);
   }
 
   function handleDeleteFavorite(targetId: number) {
     const newFavoriteRepositoriesIds = favoriteRepositoriesIds.filter(id => id !== targetId);
 
-    setItem(KEY, JSON.stringify(newFavoriteRepositoriesIds));
+    setItem(FAVORITE_ITEM_LOCALSTORAGE_KEY, JSON.stringify(newFavoriteRepositoriesIds));
     setFavoriteRepositoriesIds(newFavoriteRepositoriesIds);
   }
 

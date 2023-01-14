@@ -1,14 +1,12 @@
 # github-issue-dashboard
 
----
-
 ## 💁🏻‍♂️ Getting Started
 
 <b>📁페이히어 구현 과제</b>
 
 [구현된 사이트 (클릭)](https://github-issue-dashboard-ten.vercel.app/)
 
-<i style="color:white; background-color:tomato; font-size:80%">무단 유출을 금하기에, 과제 제출일로부터 약 5일 안에 해당 레포는 Private로 변경할 예정입니다!</i>
+<span style="color:white; background-color:tomato; font-size:80%">❗️무단 유출을 금하기에, 과제 제출일로부터 약 5일 안에 해당 레포는 Private로 변경할 예정입니다!</span>
 
 ## 📃 Description
 

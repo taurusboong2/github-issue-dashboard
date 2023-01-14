@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button, Table, TablePaginationConfig, message } from 'antd';
 
-import { fetchRepositories } from '@/networks/repository';
-import { Box, InputSearch, SimpleUser } from '@/components/common';
-import { RepositoryItem } from '@/types/repository';
-import { IconRepository } from '@/components/icons';
+import { useFetchRepositories } from '@/hooks/repository.hook';
 import { getItem, removeItem, setItem } from '@/commons/localStorage';
+import { RepositoryItem } from '@/types/repository';
+import { Box, InputSearch, SimpleUser } from '@/components/common';
+import { IconRepository } from '@/components/icons';
 
 const Home = () => {
   const [currentParams, setParams] = useSearchParams();
@@ -20,28 +20,9 @@ const Home = () => {
   const per_page = Number(currentParams.get('per_page') ?? 20);
   const queryParams = { q, page, per_page };
 
-  const [searchItems, setSearchItems] = useState<[] | RepositoryItem[]>([]);
-  const [total, setTotal] = useState(0);
   const [favoriteRepositories, setFavoriteRepositories] = useState<any[]>([]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        if (!q) {
-          setSearchItems([]);
-          setTotal(0);
-          return;
-        }
-        const res = await fetchRepositories(queryParams);
-        const { total_count, items } = res.data;
-        setSearchItems(items);
-        setTotal(total_count);
-        setParams(queryParams as any);
-      } catch (e) {
-        console.log(e);
-      }
-    })();
-  }, [q, page, per_page]);
+  const { total, items: searchedItems, isLoading } = useFetchRepositories({ q, page, per_page });
 
   function handleSearchRepositories(value: string) {
     setParams({ q: value });
@@ -89,7 +70,8 @@ const Home = () => {
         <Table
           size="middle"
           rowKey="id"
-          dataSource={searchItems}
+          dataSource={searchedItems}
+          loading={isLoading}
           columns={[
             {
               dataIndex: 'owner',

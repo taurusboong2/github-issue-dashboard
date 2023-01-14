@@ -27,3 +27,9 @@ export type RepositoryListRequestParams = {
   per_page?: number;
   page?: number;
 };
+
+export type FavoriteRepository = {
+  id: number;
+  name: string;
+  fullName: string;
+};

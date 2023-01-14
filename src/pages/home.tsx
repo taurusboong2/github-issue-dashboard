@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button, Table, TablePaginationConfig, message } from 'antd';
 
 import { useFetchRepositories } from '@/hooks/repository.hook';
-import { getItem, removeItem, setItem } from '@/commons/localStorage';
+import { getItem, setItem } from '@/commons/localStorage';
 import { RepositoryItem } from '@/types/repository';
 import { Box, InputSearch, SimpleUser } from '@/components/common';
 import { IconRepository } from '@/components/icons';
+
+const MAX_FAVORITE_ITEM_COUNT = 4;
+const KEY = 'boong_favorite_items';
 
 const Home = () => {
   const [currentParams, setParams] = useSearchParams();
@@ -20,13 +23,22 @@ const Home = () => {
   const per_page = Number(currentParams.get('per_page') ?? 20);
   const queryParams = { q, page, per_page };
 
-  const [favoriteRepositories, setFavoriteRepositories] = useState<any[]>([]);
+  const [favoriteRepositoriesIds, setFavoriteRepositoriesIds] = useState<number[]>([]);
+
   const {
     total,
     items: searchedItems,
     isLoading,
     reset: resetSearchedItems,
   } = useFetchRepositories({ q, page, per_page });
+
+  useEffect(() => {
+    const favoriteRepositoriesString = getItem(KEY);
+
+    const saved = favoriteRepositoriesString ? (JSON.parse(favoriteRepositoriesString) as number[]) : [];
+
+    setFavoriteRepositoriesIds(saved);
+  }, []);
 
   function handleSearchRepositories(value: string) {
     setParams({ q: value });
@@ -37,30 +49,29 @@ const Home = () => {
     resetSearchedItems();
   }
 
-  function handleFavoriteButton(id: any, info: any) {
-    if (favoriteRepositories.length >= 4) {
-      if (getItem(id)) {
-        removeItem(id);
-        setFavoriteRepositories([...favoriteRepositories].filter(e => e !== id));
-        return;
-      }
+  function handleAddFavorite(id: number) {
+    if (favoriteRepositoriesIds.length >= MAX_FAVORITE_ITEM_COUNT) {
       msg.open({
         type: 'error',
         content: 'You cannot save more than 4.',
       });
       return;
     }
-    if (getItem(id)) {
-      removeItem(id);
-      setFavoriteRepositories([...favoriteRepositories].filter(e => e !== id));
-      return;
-    }
-    setItem(id, info);
-    setFavoriteRepositories([...favoriteRepositories, id]);
+    const newFavoriteRepositoriesIds = [...favoriteRepositoriesIds, id];
+
+    setItem(KEY, JSON.stringify(newFavoriteRepositoriesIds));
+    setFavoriteRepositoriesIds(newFavoriteRepositoriesIds);
   }
 
-  function handleGoToIssuePage(id: string) {
-    navigate(`/issues?id=${id}`);
+  function handleDeleteFavorite(targetId: number) {
+    const newFavoriteRepositoriesIds = favoriteRepositoriesIds.filter(id => id !== targetId);
+
+    setItem(KEY, JSON.stringify(newFavoriteRepositoriesIds));
+    setFavoriteRepositoriesIds(newFavoriteRepositoriesIds);
+  }
+
+  function isFavoriteItem(id: number) {
+    return favoriteRepositoriesIds.includes(id);
   }
 
   return (
@@ -82,9 +93,9 @@ const Home = () => {
               dataIndex: 'owner',
               title: 'User Name',
               width: 300,
-              render: (_name: string, items: RepositoryItem) => (
+              render: (_name: string, item: RepositoryItem) => (
                 <>
-                  <SimpleUser userName={items.owner.login} size="30px" userImg={items.owner.avatar_url} />
+                  <SimpleUser userName={item.owner.login} size="30px" userImg={item.owner.avatar_url} />
                 </>
               ),
             },
@@ -96,9 +107,9 @@ const Home = () => {
             {
               dataIndex: 'full_name',
               title: 'Repository',
-              render: (name: string, items: RepositoryItem) => (
+              render: (name: string, item: RepositoryItem) => (
                 <Box>
-                  <a href={`https://github.com/${items.full_name}`} target="_blank" rel="noreferrer">
+                  <a href={`https://github.com/${item.full_name}`} target="_blank" rel="noreferrer">
                     <IconRepository />
                   </a>
                 </Box>
@@ -107,21 +118,31 @@ const Home = () => {
             {
               dataIndex: 'id',
               title: 'Add Favorite',
-              render: (id: any, items: RepositoryItem) => (
-                <Button
-                  type="primary"
-                  danger={getItem(id) ? true : false}
-                  onClick={() => {
-                    handleFavoriteButton(id, JSON.stringify({ items }));
-                  }}>
-                  {getItem(id) ? 'Delete' : 'Add'}
-                </Button>
-              ),
+              render: (id: number) =>
+                isFavoriteItem(id) ? (
+                  <Button
+                    type="primary"
+                    danger={true}
+                    onClick={() => {
+                      handleDeleteFavorite(id);
+                    }}>
+                    Delete
+                  </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      handleAddFavorite(id);
+                    }}>
+                    Add
+                  </Button>
+                ),
             },
             {
               dataIndex: 'id',
               title: 'See Issues',
-              render: (id: any) => getItem(id) && <Button onClick={() => handleGoToIssuePage(id)}>Go</Button>,
+              render: (id: number) =>
+                isFavoriteItem(id) ? <Button onClick={() => navigate(`/issues?id=${id}`)}>Go</Button> : <></>,
             },
           ]}
           pagination={{

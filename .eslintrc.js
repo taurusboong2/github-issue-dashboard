@@ -30,6 +30,7 @@ module.exports = {
     AUTHNAME: 'readonly',
     AUTHPASS: 'readonly',
     PHASE: 'readonly',
+    APP_TOKEN: 'readonly',
   },
   rules: {
     'prettier/prettier': ['error'],

@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
 
 const config = {
   entry: ['react-hot-loader/patch', './src/index.tsx'],
@@ -38,7 +37,9 @@ const config = {
       template: './src/index.html',
       filename: 'index.html',
     }),
-    new Dotenv(),
+    new webpack.DefinePlugin({
+      APP_TOKEN: JSON.stringify(process.env.APP_TOKEN),
+    }),
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],

@@ -5,7 +5,7 @@ import { Button, Table, TablePaginationConfig, message } from 'antd';
 
 import { useFetchRepositories } from '@/hooks/repository.hook';
 import { getItem, setItem } from '@/commons/localStorage';
-import { RepositoryItem } from '@/types/repository';
+import { RepositoryItem, FavoriteRepository } from '@/types/repository';
 import { Box, InputSearch, SimpleUser } from '@/components/common';
 import { IconRepository } from '@/components/icons';
 import { MAX_FAVORITE_ITEM_COUNT, FAVORITE_ITEM_LOCALSTORAGE_KEY } from '@/constants';
@@ -21,7 +21,7 @@ const Home = () => {
   const per_page = Number(currentParams.get('per_page') ?? 20);
   const queryParams = { q, page, per_page };
 
-  const [favoriteRepositoriesIds, setFavoriteRepositoriesIds] = useState<number[]>([]);
+  const [favoriteRepositories, setFavoriteRepositories] = useState<FavoriteRepository[]>([]);
 
   const {
     total,
@@ -33,9 +33,9 @@ const Home = () => {
   useEffect(() => {
     const favoriteRepositoriesString = getItem(FAVORITE_ITEM_LOCALSTORAGE_KEY);
 
-    const saved = favoriteRepositoriesString ? (JSON.parse(favoriteRepositoriesString) as number[]) : [];
+    const saved = favoriteRepositoriesString ? (JSON.parse(favoriteRepositoriesString) as FavoriteRepository[]) : [];
 
-    setFavoriteRepositoriesIds(saved);
+    setFavoriteRepositories(saved);
   }, []);
 
   function handleSearchRepositories(value: string) {
@@ -47,29 +47,32 @@ const Home = () => {
     resetSearchedItems();
   }
 
-  function handleAddFavorite(id: number) {
-    if (favoriteRepositoriesIds.length >= MAX_FAVORITE_ITEM_COUNT) {
+  function handleAddFavorite(item: RepositoryItem) {
+    if (favoriteRepositories.length >= MAX_FAVORITE_ITEM_COUNT) {
       msg.open({
         type: 'error',
         content: 'You cannot save more than 4.',
       });
       return;
     }
-    const newFavoriteRepositoriesIds = [...favoriteRepositoriesIds, id];
+    const newFavoriteRepositories = [
+      ...favoriteRepositories,
+      { id: item.id, name: item.name, fullName: item.full_name },
+    ];
 
-    setItem(FAVORITE_ITEM_LOCALSTORAGE_KEY, JSON.stringify(newFavoriteRepositoriesIds));
-    setFavoriteRepositoriesIds(newFavoriteRepositoriesIds);
+    setItem(FAVORITE_ITEM_LOCALSTORAGE_KEY, JSON.stringify(newFavoriteRepositories));
+    setFavoriteRepositories(newFavoriteRepositories);
   }
 
   function handleDeleteFavorite(targetId: number) {
-    const newFavoriteRepositoriesIds = favoriteRepositoriesIds.filter(id => id !== targetId);
+    const newFavoriteRepositories = favoriteRepositories.filter(({ id }) => id !== targetId);
 
-    setItem(FAVORITE_ITEM_LOCALSTORAGE_KEY, JSON.stringify(newFavoriteRepositoriesIds));
-    setFavoriteRepositoriesIds(newFavoriteRepositoriesIds);
+    setItem(FAVORITE_ITEM_LOCALSTORAGE_KEY, JSON.stringify(newFavoriteRepositories));
+    setFavoriteRepositories(newFavoriteRepositories);
   }
 
-  function isFavoriteItem(id: number) {
-    return favoriteRepositoriesIds.includes(id);
+  function isFavoriteItem(targetId: number) {
+    return favoriteRepositories.some(({ id }) => targetId === id);
   }
 
   return (
@@ -116,7 +119,7 @@ const Home = () => {
             {
               dataIndex: 'id',
               title: 'Add Favorite',
-              render: (id: number) =>
+              render: (id: number, item) =>
                 isFavoriteItem(id) ? (
                   <Button
                     type="primary"
@@ -130,7 +133,7 @@ const Home = () => {
                   <Button
                     type="primary"
                     onClick={() => {
-                      handleAddFavorite(id);
+                      handleAddFavorite(item);
                     }}>
                     Add
                   </Button>

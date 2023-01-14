@@ -29,9 +29,15 @@ export const useFetchRepositories = (params: RepositoryListRequestParams) => {
     }
   }, [q, page, per_page]);
 
+  const reset = () => {
+    setItems([]);
+    setTotal(0);
+  };
+
   return {
     items,
     total,
     isLoading,
+    reset,
   };
 };

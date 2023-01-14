@@ -21,8 +21,12 @@ const Home = () => {
   const queryParams = { q, page, per_page };
 
   const [favoriteRepositories, setFavoriteRepositories] = useState<any[]>([]);
-
-  const { total, items: searchedItems, isLoading } = useFetchRepositories({ q, page, per_page });
+  const {
+    total,
+    items: searchedItems,
+    isLoading,
+    reset: resetSearchedItems,
+  } = useFetchRepositories({ q, page, per_page });
 
   function handleSearchRepositories(value: string) {
     setParams({ q: value });
@@ -30,6 +34,7 @@ const Home = () => {
 
   function handleResetButton() {
     setParams({});
+    resetSearchedItems();
   }
 
   function handleFavoriteButton(id: any, info: any) {

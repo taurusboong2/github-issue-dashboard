@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { RepositoryListRequestParams, RepositoryItem, FavoriteRepository } from '@/types/repository';
 import { fetchRepositories } from '@/networks/repository';
+import { RepositoryListRequestParams, RepositoryItem, FavoriteRepository } from '@/types/repository';
 import { getItem } from '@/commons/localStorage';
 import { FAVORITE_ITEM_LOCALSTORAGE_KEY } from '@/constants';
 

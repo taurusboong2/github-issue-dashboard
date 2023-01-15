@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { IssuesItem } from '@/types/issue';
 import { FavoriteRepository } from '@/types/repository';
 import { fetchIssues } from '@/networks/issue';
-import { FAVORITE_ITEM_LOCALSTORAGE_KEY } from '@/constants';
 import { getItem } from '@/commons/localStorage';
+import { FAVORITE_ITEM_LOCALSTORAGE_KEY } from '@/constants';
 
 export const useFetchIssues = (targetId?: number) => {
   const [items, setItems] = useState<IssuesItem[]>([]);

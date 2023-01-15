@@ -4,8 +4,8 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button, Table, TablePaginationConfig, message } from 'antd';
 
 import { useFetchRepositories } from '@/hooks/repository.hook';
-import { getItem, setItem } from '@/commons/localStorage';
 import { RepositoryItem, FavoriteRepository } from '@/types/repository';
+import { getItem, setItem } from '@/commons/localStorage';
 import { Box, InputSearch, SimpleUser } from '@/components/common';
 import { IconRepository } from '@/components/icons';
 import { MAX_FAVORITE_ITEM_COUNT, FAVORITE_ITEM_LOCALSTORAGE_KEY } from '@/constants';
@@ -78,7 +78,7 @@ const Home = () => {
   return (
     <Container>
       <h1>Search Repositories</h1>
-      my-repository-issue
+
       <Box width="300px" flexDirection="row">
         <InputSearch placeholder="Search Repository" onSearch={handleSearchRepositories} />
         <ResetBox onClick={handleResetButton}>🔄</ResetBox>

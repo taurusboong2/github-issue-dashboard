@@ -1,6 +1,6 @@
 export type UserInfo = {
   login: string;
-  id: 1;
+  id: number;
   avatar_url: string;
 };
 export type IssuesItem = {

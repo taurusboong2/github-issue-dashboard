@@ -11,7 +11,7 @@ export const getItem = (key: string): string | null => {
   }
 };
 
-export const setItem = (key: string, value: any) => {
+export const setItem = (key: string, value: string): void => {
   localStorage.setItem(key, value);
 };
 
